@@ -5,9 +5,10 @@ const dataRoutes = require("./routes/data");
 const uri =
   "mongodb+srv://nearinclusion:Near%401995MongoDB@learningclusterfornear.5mxlam7.mongodb.net/?retryWrites=true&w=majority&appName=LearningClusterForNear";
 
-const loginServer = require("./src/login");
+// const loginServer = require("./src/login");
+const mainServer = require("./src/main");
 // const port = process.env.PORT || 3000;
-const port = 3333;
+const port = 3032;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -27,8 +28,8 @@ async function run() {
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
 
-    loginServer.listen(port, () => {
-      console.log(`API loginServer listening at http://localhost:${port}`);
+    mainServer.listen(port, () => {
+      console.log(`API mainServer listening at http://localhost:${port}`);
     });
   } finally {
     // Ensures that the client will close when you finish/error
