@@ -173,7 +173,7 @@ async function createTask(task) {
       detail: task?.detail || "",
       targetDate: task?.targetDate || "",
       createdDate: task?.createdDate || "",
-      createUser: task?.createUser || "",
+      createdUser: task?.createdUser || "",
     };
 
     // Insert a single document
