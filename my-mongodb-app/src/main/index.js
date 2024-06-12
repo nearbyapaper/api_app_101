@@ -16,6 +16,8 @@ const API_PORT = 3031;
 let userCollection;
 let taskCollection;
 
+const projection = { _id: 0 }; // Exclude the _id field
+
 // -------------------- LOGIN API --------------------
 async function connectToDatabase() {
   try {
@@ -69,11 +71,21 @@ connectToDatabase().then(() => {
   });
 
   // -------------------- TASK API --------------------
+  app.get("/task/list/:owner", async (req, res) => {
+    const taskOwner = req.params.owner;
+    try {
+      const taskListResponse = await getUserTask(taskOwner);
+      res.send(taskListResponse);
+    } catch (e) {
+      res.status(500).send("Error creating task");
+    }
+  });
+
   app.post("/task/create", async (req, res) => {
     const task = req.body;
     try {
-      await createTask(task);
-      res.send(`Task created: ${JSON.stringify(task)}`);
+      const creatTaskResponse = await createTask(task);
+      res.send(creatTaskResponse);
     } catch (e) {
       res.status(500).send("Error creating task");
     }
@@ -82,8 +94,8 @@ connectToDatabase().then(() => {
   app.post("/task/delete", async (req, res) => {
     const task = req.body;
     try {
-      await deleteTask(task);
-      res.send(`Task deleted: ${JSON.stringify(task)}`);
+      const deletedTaskResponse = await deleteTask(task);
+      res.send(deletedTaskResponse);
     } catch (e) {
       res.status(500).send("Error deleting task");
     }
@@ -92,8 +104,8 @@ connectToDatabase().then(() => {
   app.post("/task/update", async (req, res) => {
     const task = req.body;
     try {
-      await updateTask(task);
-      res.send(`Task updated: ${JSON.stringify(task)}`);
+      const updateTaskResponse = await updateTask(task);
+      res.send(updateTaskResponse);
     } catch (e) {
       res.status(500).send("Error updating task");
     }
@@ -162,6 +174,22 @@ async function loginUser(user) {
 }
 
 // -------------------- TASK API --------------------
+async function getUserTask(owner) {
+  try {
+    const query = { createdUser: owner };
+    const taskList = await taskCollection.find(query, { projection }).toArray();
+    const successResponse = {
+      success: true,
+      message: "Login successful",
+      data: taskList,
+      code: 200,
+    };
+    return successResponse;
+  } catch (error) {
+    console.log("Error getting user task error" + error);
+  }
+}
+
 async function createTask(task) {
   console.log("API Side - createTask  :: " + task);
   try {
@@ -204,13 +232,25 @@ async function deleteTask(task) {
 async function updateTask(task) {
   try {
     const result = await taskCollection.updateOne(
-      { id: task?.id, name: task?.name, createdDate: task?.createdDate },
+      {
+        id: task?.id,
+        name: task?.name,
+        createdDate: task?.createdDate,
+        createdUser: task?.createdUser,
+      },
       { $set: task }
     );
     console.log(
       `${result.matchedCount} document(s) matched the query criteria.`
     );
     console.log(`${result.modifiedCount} document(s) were updated.`);
+    const successResponse = {
+      success: true,
+      message: "Login successful",
+      data: result,
+      code: 200,
+    };
+    return successResponse;
   } catch (error) {
     console.error("Error updating task:", error);
     throw error;
