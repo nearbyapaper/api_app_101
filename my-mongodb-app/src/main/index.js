@@ -93,8 +93,11 @@ connectToDatabase().then(() => {
 
   app.post("/task/delete", async (req, res) => {
     const task = req.body;
+    console.log("Task req : " + req);
+    console.log("Task will delete : " + task);
     try {
       const deletedTaskResponse = await deleteTask(task);
+      console.log("Task deleted : " + deletedTaskResponse);
       res.send(deletedTaskResponse);
     } catch (e) {
       res.status(500).send("Error deleting task");
@@ -217,6 +220,10 @@ async function createTask(task) {
 
 async function deleteTask(task) {
   try {
+    console.log("Deleting task " + task);
+    console.log("Deleting task?.id " + task?.id);
+    console.log("Deleting task?.name " + task?.name);
+    console.log("Deleting task?.createdDate " + task?.createdDate);
     const result = await taskCollection.deleteOne({
       id: task?.id,
       name: task?.name,
@@ -230,16 +237,12 @@ async function deleteTask(task) {
 }
 
 async function updateTask(task) {
+  const query = {
+    id: task?.id,
+    createdUser: task?.createdUser,
+  };
   try {
-    const result = await taskCollection.updateOne(
-      {
-        id: task?.id,
-        name: task?.name,
-        createdDate: task?.createdDate,
-        createdUser: task?.createdUser,
-      },
-      { $set: task }
-    );
+    const result = await taskCollection.updateOne(query, { $set: task });
     console.log(
       `${result.matchedCount} document(s) matched the query criteria.`
     );
