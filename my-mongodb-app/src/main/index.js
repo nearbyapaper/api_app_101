@@ -52,7 +52,7 @@ connectToDatabase().then(() => {
       await createUser(user);
       res.send(`User created: ${JSON.stringify(user)}`);
     } catch (e) {
-      res.status(500).send("Error creating user");
+      res.status(500).send("Error creating user ::" + e);
     }
   });
 
@@ -66,7 +66,7 @@ connectToDatabase().then(() => {
         res.status(401).send("Invalid username or password");
       }
     } catch (e) {
-      res.status(500).send("Error logging in user");
+      res.status(500).send("Error logging in user :: " + e);
     }
   });
 
@@ -77,7 +77,7 @@ connectToDatabase().then(() => {
       const taskListResponse = await getUserTask(taskOwner);
       res.send(taskListResponse);
     } catch (e) {
-      res.status(500).send("Error creating task");
+      res.status(500).send("Error geting task ::" + e);
     }
   });
 
@@ -87,20 +87,17 @@ connectToDatabase().then(() => {
       const creatTaskResponse = await createTask(task);
       res.send(creatTaskResponse);
     } catch (e) {
-      res.status(500).send("Error creating task");
+      res.status(500).send("Error creating task ::" + e);
     }
   });
 
   app.post("/task/delete", async (req, res) => {
     const task = req.body;
-    console.log("Task req : " + req);
-    console.log("Task will delete : " + task);
     try {
       const deletedTaskResponse = await deleteTask(task);
-      console.log("Task deleted : " + deletedTaskResponse);
       res.send(deletedTaskResponse);
     } catch (e) {
-      res.status(500).send("Error deleting task");
+      res.status(500).send("Error deleting task  ::" + e);
     }
   });
 
@@ -110,7 +107,7 @@ connectToDatabase().then(() => {
       const updateTaskResponse = await updateTask(task);
       res.send(updateTaskResponse);
     } catch (e) {
-      res.status(500).send("Error updating task");
+      res.status(500).send("Error updating task ::" + e);
     }
   });
 
@@ -163,7 +160,7 @@ async function loginUser(user) {
       console.log("API User found:", findUser);
       const successResponse = {
         success: true,
-        message: "Login successful",
+        message: "Success",
         data: findUser,
         code: 200,
       };
@@ -183,7 +180,7 @@ async function getUserTask(owner) {
     const taskList = await taskCollection.find(query, { projection }).toArray();
     const successResponse = {
       success: true,
-      message: "Login successful",
+      message: "Success",
       data: taskList,
       code: 200,
     };
@@ -194,7 +191,6 @@ async function getUserTask(owner) {
 }
 
 async function createTask(task) {
-  console.log("API Side - createTask  :: " + task);
   try {
     const doc = {
       id: task?.id || "",
@@ -213,17 +209,13 @@ async function createTask(task) {
       `New document inserted with the following id: ${result.insertedId}`
     );
   } catch (e) {
-    console.error(e);
+    console.error("Error createTask :", e);
     throw e;
   }
 }
 
 async function deleteTask(task) {
   try {
-    console.log("Deleting task " + task);
-    console.log("Deleting task?.id " + task?.id);
-    console.log("Deleting task?.name " + task?.name);
-    console.log("Deleting task?.createdDate " + task?.createdDate);
     const result = await taskCollection.deleteOne({
       id: task?.id,
       name: task?.name,
@@ -249,7 +241,7 @@ async function updateTask(task) {
     console.log(`${result.modifiedCount} document(s) were updated.`);
     const successResponse = {
       success: true,
-      message: "Login successful",
+      message: "Success",
       data: result,
       code: 200,
     };
