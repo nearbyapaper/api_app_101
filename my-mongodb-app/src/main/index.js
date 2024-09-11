@@ -122,10 +122,10 @@ connectToDatabase().then(() => {
 
     try {
       // Call the validation function
-      const mockres = await validateScanBarcode(mockReq);
+      const res = await validateScanBarcode(mockReq);
 
       // Send a response with the task object
-      res.json({ message: "Task created successfully", mockres });
+      res.json(res.mockres);
     } catch (e) {
       // Send error response
       console.error("Error call mock", e);
