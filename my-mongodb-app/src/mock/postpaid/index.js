@@ -1,54 +1,34 @@
+// Import necessary modules
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
 const app = express();
-app.use(express.json());
+app.use(express.json()); // Middleware to parse JSON requests
 
-const uri =
-  "mongodb+srv://nearinclusion:Near%401995MongoDB@learningclusterfornear.5mxlam7.mongodb.net/?retryWrites=true&w=majority&appName=LearningClusterForNear";
-const client = new MongoClient(uri);
+// Define a route to handle the mock postpaid validation
+app.post("/mock/postpaid/validateScanBarcode", async (req, res) => {
+  const mockReq = {
+    simBarCode: "66949415156",
+    userCode: "Arwut",
+    userLan: "OMRMOBILE01",
+    userFormatType: "USER_LAN",
+  };
 
-let collection;
-
-async function connectToDatabase() {
   try {
-    // Connect to the MongoDB cluster
-    await client.connect();
+    // Call the validation function
+    const mockres = await validateScanBarcode(mockReq);
 
-    // Specify the database and collection
-    const database = client.db("nearMongoDB");
-    collection = database.collection("postpaidCollection");
-
-    console.log("Connected to MongoDB");
+    // Send a response with the task object
+    res.json({ message: "Task created successfully", mockres });
   } catch (e) {
-    console.error("Failed to connect to MongoDB", e);
+    // Send error response
+    console.error("Error call mock", e);
+    res.status(500).json({ error: "Failed to call mock" });
   }
-}
-
-connectToDatabase().then(() => {
-  // Define routes
-  app.post("/mock/postpaid/validateScanBarcode", async (req, res) => {
-    const mockReq = {
-      simBarCode: "66949415156",
-      userCode: "Arwut",
-      userLan: "OMRMOBILE01",
-      userFormatType: "USER_LAN",
-    };
-    try {
-      await validateScanBarcode(mockReq);
-      res.send(`Task created: ${JSON.stringify(task)}`);
-    } catch (e) {
-      res.status(500).send("Error Task created");
-    }
-  });
-
-  // Start the server after connecting to the database
-  app.listen(3000, () => {
-    console.log("Server is running on port 3000");
-  });
 });
 
+// Function to simulate barcode validation
 async function validateScanBarcode(req) {
   try {
+    // Mock response object to simulate a successful validation
     const mockResponse = {
       codeType: "S",
       code: "200",
@@ -80,10 +60,15 @@ async function validateScanBarcode(req) {
     };
     return mockResponse;
   } catch (e) {
-    console.error(e);
-    throw e;
+    console.error("Error during validation", e);
+    throw e; // Throw the error to be caught in the calling function
   }
 }
 
-// Export the app
+// Start the server on port 3000
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
+
+// Export the app for testing or other uses
 module.exports = app;
